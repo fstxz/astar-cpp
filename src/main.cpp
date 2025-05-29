@@ -9,19 +9,18 @@
 struct Vec2i {
     int x, y;
 
-    bool operator==(const Vec2i& other) const {
+    bool operator==(const Vec2i &other) const {
         return x == other.x && y == other.y;
     }
 };
 
 namespace std {
-    template<>
-    struct hash<Vec2i> {
-        size_t operator()(const Vec2i& p) const {
-            return hash<int>()(p.x) ^ (hash<int>()(p.y) << 1);
-        }
-    };
-}
+template <> struct hash<Vec2i> {
+    size_t operator()(const Vec2i &p) const {
+        return hash<int>()(p.x) ^ (hash<int>()(p.y) << 1);
+    }
+};
+} // namespace std
 
 struct Cell {
     Vec2i position;
@@ -50,12 +49,13 @@ struct Pair {
     Vec2i position;
     float priority;
 
-    bool operator<(const Pair& other) const {
+    bool operator<(const Pair &other) const {
         return priority > other.priority;
     }
 };
 
-std::vector<Vec2i> construct_path(std::unordered_map<Vec2i, Vec2i> came_from, Vec2i current) {
+std::vector<Vec2i> construct_path(std::unordered_map<Vec2i, Vec2i> came_from,
+                                  Vec2i current) {
     std::vector<Vec2i> total_path;
     total_path.push_back(current);
 
@@ -70,10 +70,11 @@ std::vector<Vec2i> get_neightbors(Vec2i at) {
     std::vector<Vec2i> neighbors;
     std::vector<Vec2i> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
-    for (const Vec2i& dir : directions) {
+    for (const Vec2i &dir : directions) {
         Vec2i check_pos = {at.x + dir.x, at.y + dir.y};
 
-        if (check_pos.x >= 0 && check_pos.x < 16 && check_pos.y >= 0 && check_pos.y < 16) {
+        if (check_pos.x >= 0 && check_pos.x < 16 && check_pos.y >= 0 &&
+            check_pos.y < 16) {
             neighbors.emplace_back(check_pos);
         }
     }
@@ -97,7 +98,7 @@ float h(Vec2i from, Vec2i to) {
 
 std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
     std::priority_queue<Pair> frontier;
-    frontier.push(Pair { start_position, 0.0});
+    frontier.push(Pair{start_position, 0.0});
 
     std::unordered_map<Vec2i, Vec2i> came_from;
 
@@ -111,11 +112,15 @@ std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
             return construct_path(came_from, current.position);
         }
 
-        for (const Vec2i& next : get_neightbors(current.position)) {
-            float tentative_g_score = g_score[current.position] + h(current.position, next) * get_cell_weight(next);
+        for (const Vec2i &next : get_neightbors(current.position)) {
+            float tentative_g_score =
+                g_score[current.position] +
+                h(current.position, next) * get_cell_weight(next);
 
-            if (g_score.find(next) == g_score.end() || tentative_g_score < g_score[next]) {
-                frontier.push( Pair { next, tentative_g_score + h(next, target_position)});
+            if (g_score.find(next) == g_score.end() ||
+                tentative_g_score < g_score[next]) {
+                frontier.push(
+                    Pair{next, tentative_g_score + h(next, target_position)});
                 g_score[next] = tentative_g_score;
                 came_from[next] = current.position;
             }
@@ -132,8 +137,8 @@ int main() {
     int start_pos_y = 0;
     std::cout << "Start Y: ";
     std::cin >> start_pos_y;
-
     int end_pos_x = 0;
+
     std::cout << "End X: ";
     std::cin >> end_pos_x;
     int end_pos_y = 0;
@@ -142,7 +147,8 @@ int main() {
 
     Vec2i start_pos = {start_pos_x, start_pos_y};
     Vec2i end_pos = {end_pos_x, end_pos_y};
-    if (start_pos.x < 0 || start_pos.x > 15 || start_pos.y < 0 || start_pos.y > 15) {
+    if (start_pos.x < 0 || start_pos.x > 15 || start_pos.y < 0 ||
+        start_pos.y > 15) {
         std::cerr << "Start position is out of range" << std::endl;
         return 1;
     }
@@ -153,13 +159,13 @@ int main() {
 
     auto path = get_path(start_pos, end_pos);
 
-    for (const Vec2i& pos : path) {
+    for (const Vec2i &pos : path) {
         graph[pos.x][pos.y] = 8;
     }
 
     std::cout << "0: empty cell, 1: occupied cell, 8: path" << std::endl;
-    for (const auto& row : graph) {
-        for (const auto& element : row) {
+    for (const auto &row : graph) {
+        for (const auto &element : row) {
             std::cout << element << " ";
         }
         std::cout << std::endl;
