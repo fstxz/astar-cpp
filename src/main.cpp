@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -66,8 +67,7 @@ std::vector<Vec2i> construct_path(std::unordered_map<Vec2i, Vec2i> came_from,
     return total_path;
 }
 
-std::vector<Vec2i> get_neightbors(Vec2i at) {
-    std::vector<Vec2i> neighbors;
+void get_neighbors(Vec2i at, std::vector<Vec2i> &neighbors) {
     std::vector<Vec2i> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
     for (const Vec2i &dir : directions) {
@@ -75,11 +75,9 @@ std::vector<Vec2i> get_neightbors(Vec2i at) {
 
         if (check_pos.x >= 0 && check_pos.x < 16 && check_pos.y >= 0 &&
             check_pos.y < 16) {
-            neighbors.emplace_back(check_pos);
+            neighbors.push_back(check_pos);
         }
     }
-
-    return neighbors;
 }
 
 float get_cell_weight(Vec2i at) {
@@ -105,6 +103,8 @@ std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
     std::unordered_map<Vec2i, float> g_score;
     g_score[start_position] = 0.0;
 
+    auto neighbors = std::vector<Vec2i>();
+
     while (!frontier.empty()) {
         Pair current = frontier.top();
         frontier.pop();
@@ -112,7 +112,8 @@ std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
             return construct_path(came_from, current.position);
         }
 
-        for (const Vec2i &next : get_neightbors(current.position)) {
+        get_neighbors(current.position, neighbors);
+        for (const Vec2i &next : neighbors) {
             float tentative_g_score =
                 g_score[current.position] +
                 h(current.position, next) * get_cell_weight(next);
@@ -125,6 +126,7 @@ std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
                 came_from[next] = current.position;
             }
         }
+        neighbors.clear();
     }
 
     return std::vector<Vec2i>();
@@ -157,7 +159,13 @@ int main() {
         return 1;
     }
 
+    auto time = std::chrono::steady_clock::now();
+
     auto path = get_path(start_pos, end_pos);
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+                       std::chrono::steady_clock::now() - time)
+                       .count();
 
     for (const Vec2i &pos : path) {
         graph[pos.x][pos.y] = 8;
@@ -170,6 +178,9 @@ int main() {
         }
         std::cout << std::endl;
     }
+
+    std::cout << "Path found in " << elapsed << " µs" << std::endl;
+    ;
 
     return 0;
 }
