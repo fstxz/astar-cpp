@@ -23,10 +23,6 @@ template <> struct hash<Vec2i> {
 };
 } // namespace std
 
-struct Cell {
-    Vec2i position;
-};
-
 int graph[16][16] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
