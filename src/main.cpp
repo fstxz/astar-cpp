@@ -176,7 +176,6 @@ int main() {
     }
 
     std::cout << "Path found in " << elapsed << " µs" << std::endl;
-    ;
 
     return 0;
 }
