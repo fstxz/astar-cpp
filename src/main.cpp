@@ -164,17 +164,42 @@ int main() {
                        .count();
 
     for (const Vec2i &pos : path) {
-        graph[pos.x][pos.y] = 8;
+        graph[pos.x][pos.y] = 2;
     }
 
-    std::cout << "0: empty cell, 1: occupied cell, 8: path" << std::endl;
+    graph[start_pos.x][start_pos.y] = 3;
+    graph[end_pos.x][end_pos.y] = 4;
+
     for (const auto &row : graph) {
         for (const auto &element : row) {
-            std::cout << element << " ";
+            switch (element) {
+            case 0: {
+                std::cout << "·";
+                break;
+            }
+            case 1: {
+                std::cout << "█";
+                break;
+            }
+            case 2: {
+                std::cout << "×";
+                break;
+            }
+            case 3: {
+                std::cout << "S";
+                break;
+            }
+            case 4: {
+                std::cout << "G";
+                break;
+            }
+            }
+            std::cout << " ";
         }
         std::cout << std::endl;
     }
 
+    std::cout << "█: occupied cell, ×: path, S: start, G: goal" << std::endl;
     std::cout << "Path found in " << elapsed << " µs" << std::endl;
 
     return 0;
