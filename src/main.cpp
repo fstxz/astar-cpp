@@ -57,7 +57,7 @@ std::vector<Vec2i> construct_path(std::unordered_map<Vec2i, Vec2i> came_from,
     total_path.push_back(current);
 
     while (came_from.find(current) != came_from.end()) {
-        current = came_from[current];
+        current = came_from.at(current);
         total_path.push_back(current);
     }
     return total_path;
@@ -111,11 +111,11 @@ std::vector<Vec2i> get_path(Vec2i start_position, Vec2i target_position) {
         get_neighbors(current.position, neighbors);
         for (const Vec2i &next : neighbors) {
             float tentative_g_score =
-                g_score[current.position] +
+                g_score.at(current.position) +
                 h(current.position, next) * get_cell_weight(next);
 
             if (g_score.find(next) == g_score.end() ||
-                tentative_g_score < g_score[next]) {
+                tentative_g_score < g_score.at(next)) {
                 frontier.push(
                     Pair{next, tentative_g_score + h(next, target_position)});
                 g_score[next] = tentative_g_score;
